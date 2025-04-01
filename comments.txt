@@ -1,0 +1,56 @@
+index.js
+
+ /*try{
+        let body = '';
+        console.log(body);
+        console.log('Received request to run command');
+        req.on('data', chunk => {
+            const command = chunk.toString();
+            const child = spawn(command);
+            child.stdout.on('data', (data) => {
+                body += ' ' + data.toString();
+            });
+        });
+        console.log('sending the response');
+        req.on('end', () => {
+            res.end(body);
+        });
+    }
+    catch(err) {
+        console.log("error sending the data")
+    }
+    } else {
+        res.statusCode = 404;
+        res.end('Not Found');
+    }
+*/
+            
+
+
+
+
+/*
+     if (req.url === '/run' && req.method === 'POST') {
+    let requestBody = '';
+    req.on('data', chunk => {
+        requestBody += chunk.toString();
+    });
+    req.on('end', () => {
+        console.log('Received command:', requestBody);
+        // Use spawn with shell: true to allow command strings with complex syntax.
+        const child = spawn(requestBody, { shell: true });
+        let outputBuffer = '';
+
+        child.stdout.on('data', (data) => {
+            outputBuffer += data.toString();
+        });
+        child.stderr.on('data', (data) => {
+            outputBuffer += data.toString();
+        });
+        child.on('close', (code) => {
+            console.log('Command finished with code:', code);
+            res.end(outputBuffer);
+        });
+    });
+    }
+*/

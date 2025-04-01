@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CERRF Drag-and-Drop Terminal Executor</title>
+  <link rel="stylesheet" type="text/css" href="/public/style.css">
+  <script src="/public/script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>CERRF Drag-and-Drop Terminal Executor</h1>
+
+  <div class="block-palette" id="block-palette">
+    <h2>Block Palette</h2>
+    <!-- Blocks will be loaded here from /blocks/blocks.json -->
+  </div>
+
+  <div class="drop-area" id="drop-area">
+    Drop command blocks here...
+    <div id="bin" class="bin">🗑️ Drag here to delete</div>
+    <button id="run-button" href="/run">Run</button>
+  </div>
+
+  <div class="output-section">
+    <h2>Output</h2>
+    <div id="output-terminal" class="terminal"></div>
+    <input type="text" id="terminal-input" placeholder="Type command here" onsubmit="runCommand(terminal-input.value);">
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

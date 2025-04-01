@@ -1,0 +1,44 @@
+[
+    {
+      "name": "Custom",
+      "class": "block",
+      "draggable": true,
+      "blockType": "command",
+      "innerHTML": "<div class=\"block-title\">Custom</div><div class=\"command-details\"><input type=\"text\" placeholder=\"Enter a terminal command/s directly\" style=\"display:none;\"></div>"
+    },
+    {
+      "name": "SSH",
+      "class": "block",
+      "draggable": true,
+      "blockType": "ssh",
+      "innerHTML": "<div class=\"block-title\">SSH</div><div class=\"ssh-details\"><input type=\"text\" class=\"ssh-host\" placeholder=\"Host\"><input type=\"text\" class=\"ssh-user\" placeholder=\"User\"><input type=\"text\" class=\"ssh-command\" placeholder=\"Command\" style=\"display:none;\"></div>"
+    },
+    {
+      "name": "Ping",
+      "class": "block",
+      "draggable": true,
+      "blockType": "ping",
+      "innerHTML": "<div class=\"block-title\">Ping</div><div class=\"ping-details\"><input type=\"text\" class=\"ping-host\" placeholder=\"Host\" style=\"display:none;\"></div>"
+    },
+    {
+      "name": "FTP",
+      "class": "block",
+      "draggable": true,
+      "blockType": "ftp",
+      "innerHTML": "<div class=\"block-title\">FTP</div><div class=\"ftp-details\"><input type=\"text\" class=\"ftp-host\" placeholder=\"Host\"><input type=\"text\" class=\"ftp-user\" placeholder=\"Username\"><input type=\"password\" class=\"ftp-pass\" placeholder=\"Password\" style=\"display:none;\"></div>"
+    },
+    {
+      "name": "Nano",
+      "class": "block",
+      "draggable": true,
+      "blockType": "nano",
+      "innerHTML": "<div class=\"block-title\">Nano</div><div class=\"nano-details\"><input type=\"text\" class=\"nano-filename\" placeholder=\"File Name\" style=\"display:none;\"></div>"
+    },
+    {
+      "name": "Sudo",
+      "class": "block",
+      "draggable": true,
+      "blockType": "sudo",
+      "innerHTML": "<div class=\"block-title\">Sudo</div><div class=\"sudo-commands\">Drop command blocks here. They will be executed prefixed with 'sudo'.</div>"
+    }
+  ]
