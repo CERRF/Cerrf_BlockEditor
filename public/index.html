@@ -6,27 +6,37 @@
   <link rel="stylesheet" type="text/css" href="/public/style.css">
   <script src="/public/script.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnH/PRulSRiXlUGsXDaBfDhfQjqiaSsv2ZeY97xQuPxL5E9cQHHDHm3pDUr4HUe/" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-  <h1>CERRF Drag-and-Drop Terminal Executor</h1>
+  <h1 style="text-align:center">CERRF Drag-and-Drop Terminal Executor</h1>
+  <div container="Left">
+    <div class="block-palette" id="block-palette">
+      <h2>Block Palette</h2>
+      <!-- Blocks will be loaded here from /blocks/blocks.json -->
+    </div>
 
-  <div class="block-palette" id="block-palette">
-    <h2>Block Palette</h2>
-    <!-- Blocks will be loaded here from /blocks/blocks.json -->
+    <div class="drop-area" id="drop-area">
+      Drop command blocks here...
+      <button id="run-button" href="/run">Run</button>
+    </div>
+
+    <div class="output-section">
+      <h2>Output</h2>
+      <div id="output-terminal" class="terminal"></div>
+      <input type="text" id="terminal-input" placeholder="Type command here" onsubmit="runCommand(terminal-input.value);">
+    </div>
   </div>
 
-  <div class="drop-area" id="drop-area">
-    Drop command blocks here...
-    <div id="bin" class="bin">🗑️ Drag here to delete</div>
-    <button id="run-button" href="/run">Run</button>
+  <div container="Right">
+    <div class="Animated Workshop">
+      <h2>Animated Workshop</h2>
+      <div id="animated-workshop">
+        <!-- Animated workshop content will be loaded here -->
+      </div>
+      <button id="restart-animated-workshop">Clear Animated Workshop</button>
+      <button id="load-animated-workshop">Load Animated Workshop</button>
+    </div>
   </div>
-
-  <div class="output-section">
-    <h2>Output</h2>
-    <div id="output-terminal" class="terminal"></div>
-    <input type="text" id="terminal-input" placeholder="Type command here" onsubmit="runCommand(terminal-input.value);">
-  </div>
-
-  <script src="script.js"></script>
 </body>
 </html>

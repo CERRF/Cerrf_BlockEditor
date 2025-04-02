@@ -66,8 +66,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 newBlock.className = def.class;
                 newBlock.dataset.blockType = def.blockType;
                 newBlock.id = 'block-' + Date.now();
+                newBlock.setAttribute('draggable', 'true');
+                newBlock.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        type: def.blockType,
+                        from: 'canvas'
+                    }));
+                    e.dataTransfer.effectAllowed = 'move';
+                    draggedElement = newBlock;
+                });
+                newBlock.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+                // Create the icon element using Font Awesome classes if provided.
+                if (def.icon) {
+                  const iconElement = document.createElement('i');
+                  iconElement.className = def.icon;
+                  newBlock.prepend(iconElement);
+                }
+                // Replace any hidden elements in innerHTML (if applicable)
                 let html = def.innerHTML.replace(/style\s*=\s*["']display\s*:\s*none;?["']/i, 'style="display:block;"');
-                newBlock.innerHTML = html;
+                newBlock.innerHTML += html;
                 makeDraggable(newBlock);
             } else if (info.from === 'canvas') {
                 newBlock = draggedElement;
@@ -76,6 +96,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             container.appendChild(newBlock);
+
+            // Add delete button to block if dropped in drop-area.
+            if (container.id === 'drop-area') {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '×';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    newBlock.remove();
+                });
+                newBlock.style.position = 'relative';
+                deleteBtn.style.position = 'absolute';
+                deleteBtn.style.top = '2px';
+                deleteBtn.style.right = '2px';
+                deleteBtn.style.background = '#ff6666';
+                deleteBtn.style.border = 'none';
+                deleteBtn.style.color = '#fff';
+                deleteBtn.style.cursor = 'pointer';
+                deleteBtn.style.padding = '2px 6px';
+                newBlock.appendChild(deleteBtn);
+            }
         } catch (error) {
             console.error('Drop error:', error);
         }
@@ -87,18 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     dropArea.addEventListener('drop', (e) => {
         handleDrop(e, dropArea);
-    });
-
-    bin.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    });
-    bin.addEventListener('drop', (e) => {
-        e.preventDefault();
-        if (draggedElement) {
-            draggedElement.remove();
-            draggedElement = null;
-        }
     });
 
     // Function to send a command string to the server and process output.
@@ -125,20 +154,64 @@ document.addEventListener('DOMContentLoaded', () => {
         outputTerminal.scrollTop = outputTerminal.scrollHeight;
     }
 
+    // Helper to extract a command string from a block by concatenating its non‑empty input values.
+    function getBlockCommand(block) {
+        const inputs = block.querySelectorAll('input');
+        const values = [];
+        inputs.forEach(input => {
+            const val = input.value.trim();
+            if (val) values.push(val);
+        });
+
+        // Prefix the blockType to the command string
+        const blockType = block.dataset.blockType;
+        if (blockType) {
+            return `${blockType} ${values.join(' ')}`;
+        }
+
+        return values.join(' ');
+    }
+
+    // Run button event: iterates over top-level dropped blocks and builds the command string.
     runButton.addEventListener('click', () => {
-        const blocks = Array.from(dropArea.children).filter(child => child.classList.contains('block'));
+        // Get only top-level blocks in the drop area.
+        const topBlocks = Array.from(dropArea.children).filter(child => child.classList.contains('block'));
         const commands = [];
 
-        blocks.forEach(block => {
-            if (block.dataset.blockType === 'command') {
-                const cmd = block.querySelector('.command-details input').value;
+        topBlocks.forEach(block => {
+            if (block.dataset.blockType === 'sudo') {
+                // Handle sudo blocks
+                const nestedBlocks = Array.from(block.querySelectorAll('.block'));
+                let nestedCommands = [];
+                if (nestedBlocks.length > 0) {
+                    nestedBlocks.forEach(nested => {
+                        const cmd = getBlockCommand(nested);
+                        if (cmd) nestedCommands.push(cmd);
+                    });
+                } else {
+                    const cmd = getBlockCommand(block);
+                    if (cmd) nestedCommands.push(cmd);
+                }
+                if (nestedCommands.length > 0) {
+                    // Prepend "sudo" to every nested command
+                    commands.push(nestedCommands.map(c => `sudo ${c}`).join(' && '));
+                }
+            } else {
+                // For all other block types, simply extract the command inputs
+                const cmd = getBlockCommand(block);
                 if (cmd) {
                     commands.push(cmd);
                 }
             }
         });
-        if (commands.length === 0) return;
+
+        if (commands.length === 0) {
+            console.log("No commands entered");
+            return;
+        }
+
         const commandStr = commands.join(' && ');
+        console.log('Run button pressed. Command string:', commandStr);
         runCommand(commandStr);
     });
 
