@@ -6,9 +6,31 @@
   <link rel="stylesheet" type="text/css" href="/public/style.css">
   <script src="/public/script.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnH/PRulSRiXlUGsXDaBfDhfQjqiaSsv2ZeY97xQuPxL5E9cQHHDHm3pDUr4HUe/" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      Hello <span id="user-ip">{{your_ip}}</span>
+    </div>
+    <div class="navbar-center">
+      <img src="/public/cerrf-logo.png" alt="CERRF Logo" class="logo">
+    </div>
+    <div class="navbar-right">
+      <div class="dropdown">
+        <button class="dropdown-toggle">Achievements</button>
+        <div class="dropdown-content">
+          <ul>
+            <li>Achievement 1</li>
+            <li>Achievement 2</li>
+            <li>Achievement 3</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
   <h1 style="text-align:center">CERRF Drag-and-Drop Terminal Executor</h1>
   <div container="Left">
     <div class="block-palette" id="block-palette">
@@ -29,13 +51,13 @@
   </div>
 
   <div container="Right">
-    <div class="Animated Workshop">
+    <div class="animated-workshop">
       <h2>Animated Workshop</h2>
-      <div id="animated-workshop">
-        <!-- Animated workshop content will be loaded here -->
+      <div id="workshop-content">
+        <!-- Dynamic content will be loaded here -->
       </div>
-      <button id="restart-animated-workshop">Clear Animated Workshop</button>
-      <button id="load-animated-workshop">Load Animated Workshop</button>
+      <button id="restart-workshop" disabled>Restart Workshop</button>
+      <button id="load-workshop">Load Workshop</button>
     </div>
   </div>
 </body>

@@ -162,6 +162,9 @@ h1 {
     padding: 20px;
     margin-top: 20px;
     background-color: #f9f9f9;
+    /* Ensure it occupies the full height of column 2 */
+    height: 100%;
+    box-sizing: border-box;
 }
 
 #workshop-content {
@@ -184,4 +187,85 @@ h1 {
 #restart-workshop:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+/* Navbar styling */
+.navbar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+.navbar-left,
+.navbar-center,
+.navbar-right {
+  flex: 1;
+}
+
+.navbar-center {
+  text-align: center;
+}
+
+.navbar-left {
+  text-align: left;
+  font-size: 14px;
+}
+
+.navbar-right {
+  text-align: right;
+}
+
+/* Logo styling */
+.logo {
+  max-height: 40px;
+}
+
+/* Dropdown styling */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background-color: #555;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  min-width: 150px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-content li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  color: #000; /* Achievement text set to black */
+}
+
+.dropdown-content li:hover {
+  background-color: #f1f1f1;
+}
+
+/* Show dropdown on click (or hover, if preferred) */
+.dropdown:hover .dropdown-content {
+  display: block;
 }

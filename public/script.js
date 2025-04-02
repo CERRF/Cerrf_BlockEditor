@@ -226,4 +226,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     appendToTerminal('$ ');
+
+    document.getElementById('load-workshop').addEventListener('click', () => {
+        // Show a popup to select a workshop
+        showWorkshopPopup();
+    });
+
+    document.getElementById('restart-workshop').addEventListener('click', () => {
+        // Reset the workshop to its initial state
+        resetWorkshop();
+    });
+
+    function showWorkshopPopup() {
+        // Display a list of available workshops
+        // Load the selected workshop into the #workshop-content area
+    }
+
+    function resetWorkshop() {
+        // Clear the workshop content and reset progress
+        const workshopContent = document.getElementById('workshop-content');
+        workshopContent.innerHTML = '';
+    }
 });
