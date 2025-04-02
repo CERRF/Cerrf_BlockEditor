@@ -15,7 +15,6 @@ const server = http.createServer((req, res) => {
             clientIPupdated = clientIP.replace(/^::ffff:/, ''); // this removes the IPv6 prefix if it exists 
             console.log('Client IP after removing prefix:', clientIPupdated); // this prints the cleaned IP address to console
             const updatedData = data.replace(/{{your_ip}}/g, clientIPupdated); // this replaces the placeholder in the HTML with the actual IPv4 address
-            console.log('Updated HTML with IP:', updatedData); // this prints the updated HTML to console
             res.end(updatedData);
         });
     } else if (req.url.startsWith('/public/') && req.method === 'GET') {

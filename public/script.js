@@ -247,4 +247,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const workshopContent = document.getElementById('workshop-content');
         workshopContent.innerHTML = '';
     }
+
+    // Trigger file input when "Load Workshop" button is clicked
+    document.getElementById('load-workshop').addEventListener('click', function() {
+        document.getElementById('workshop-file-input').click();
+    });
+
+    // Handle file selection and read the content
+    document.getElementById('workshop-file-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const content = event.target.result;
+                // If the file is JSON, parse it and generate HTML
+                if (file.name.endsWith('.json')) {
+                    try {
+                        const workshop = JSON.parse(content);
+                        let workshopHTML = `<h3>${workshop.title || 'Workshop'}</h3>`;
+                        if (Array.isArray(workshop.steps)) {
+                            workshop.steps.forEach((step, index) => {
+                                workshopHTML += `<div class="workshop-step">
+                                    <h4>Step ${index+1}: ${step.title}</h4>
+                                    ${ step.image ? `<img src="${step.image}" alt="${step.title}" />` : '' }
+                                    <p>${step.description}</p>
+                                </div>`;
+                            });
+                        }
+                        document.getElementById('workshop-content').innerHTML = workshopHTML;
+                    } catch (error) {
+                        console.error('Error parsing workshop JSON:', error);
+                    }
+                } else {
+                    // Otherwise treat it as an HTML snippet and load directly
+                    document.getElementById('workshop-content').innerHTML = content;
+                }
+            };
+            reader.readAsText(file);
+        }
+    });
 });
