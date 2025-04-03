@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const bun_command = ['python'];
 
 const server = http.createServer((req, res) => {
     if (req.url === '/' && req.method === 'GET') {
@@ -38,6 +39,7 @@ const server = http.createServer((req, res) => {
         req.on('data', chunk => {
         requestBody += chunk.toString();
     });
+        
         req.on('end', () => {
         console.log('Received command:', requestBody);
         const child = spawn(requestBody, { shell: true });

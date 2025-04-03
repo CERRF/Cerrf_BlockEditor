@@ -257,26 +257,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('workshop-file-input').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
+            console.log("File selected:", file.name);
             const fileName = file.name.toLowerCase();
             if (fileName.endsWith('.awf')) {
-                // Use FileReader to load as an ArrayBuffer (required by JSZip)
                 const reader = new FileReader();
                 reader.onload = function(event) {
+                    console.log("Reading file as ArrayBuffer...");
                     JSZip.loadAsync(event.target.result)
                         .then(function(zip) {
-                            // Read the manifest (should be at the root as manifest.json)
+                            console.log("Loading ZIP file...");
                             return zip.file("manifest.json").async("string")
                                 .then(function(manifestStr) {
+                                    console.log("Extracting manifest.json...");
                                     const manifest = JSON.parse(manifestStr);
+                                    console.log("Manifest content:", manifest);
                                     let workshopHTML = `<h3>${manifest.title || 'Workshop'}</h3>`;
-                                    // Process each step listed in the manifest
                                     if (Array.isArray(manifest.steps)) {
                                         let stepPromises = manifest.steps.map(function(stepPath) {
-                                            // Each step file (e.g., steps/step1.json) is parsed as JSON.
                                             return zip.file(stepPath).async("string")
                                                 .then(function(stepStr) {
                                                     const step = JSON.parse(stepStr);
-                                                    // Build HTML for the step. (Images could be data URLs or created via blob URLs.)
                                                     return `<div class="workshop-step">
                                                         <h4>Step ${step.stepNumber || ''}: ${step.title}</h4>
                                                         ${ step.image ? `<img src="${step.image}" alt="${step.title}" />` : '' }
@@ -288,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                             .then(function(stepsHTML) {
                                                 workshopHTML += stepsHTML.join("");
                                                 document.getElementById('workshop-content').innerHTML = workshopHTML;
-                                                // Optionally load custom CSS/JS specified in manifest.assets here.
                                             })
                                             .catch(function(err) {
                                                 console.error("Error processing step files:", err);
@@ -303,35 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                 };
                 reader.readAsArrayBuffer(file);
-            } else if (fileName.endsWith('.json')) {
-                // Handle standalone JSON workshop files (legacy support)
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    try {
-                        const workshop = JSON.parse(event.target.result);
-                        let workshopHTML = `<h3>${workshop.title || 'Workshop'}</h3>`;
-                        if (Array.isArray(workshop.steps)) {
-                            workshop.steps.forEach((step, index) => {
-                                workshopHTML += `<div class="workshop-step">
-                                    <h4>Step ${index+1}: ${step.title}</h4>
-                                    ${ step.image ? `<img src="${step.image}" alt="${step.title}" />` : '' }
-                                    <p>${step.description}</p>
-                                </div>`;
-                            });
-                        }
-                        document.getElementById('workshop-content').innerHTML = workshopHTML;
-                    } catch (error) {
-                        console.error('Error parsing workshop JSON:', error);
-                    }
-                };
-                reader.readAsText(file);
-            } else if (fileName.endsWith('.html')) {
-                // Otherwise treat it as an HTML snippet and load directly.
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('workshop-content').innerHTML = event.target.result;
-                };
-                reader.readAsText(file);
+            } else {
+                console.error("Unsupported file type. Please upload a .awf file.");
             }
         }
     });
