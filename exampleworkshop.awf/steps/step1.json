@@ -1,0 +1,11 @@
+{
+    "stepNumber": 1,
+    "title": "Drag the Ping Block",
+    "description": "Drag the Ping block from the palette into the drop area. Then, enter a valid host (e.g., 8.8.8.8) to test network connectivity.",
+    "expectedBlock": "ping",
+    "image": "assets/images/step1-img.png",
+    "hints": [
+      "Look for the block with the bullseye icon.",
+      "Ensure you provide an IP address like 8.8.8.8."
+    ]
+  }

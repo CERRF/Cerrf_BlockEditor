@@ -1,0 +1,17 @@
+{
+  "title": "Test Workshop - Command Basics",
+  "description": "A simple workshop to help you test basic command block functions.",
+  "version": "1.0",
+  "steps": [
+    "steps/step1.json",
+    "steps/step2.json"
+  ],
+  "assets": {
+    "css": "code/custom.css",
+    "js": "code/custom.js"
+  },
+  "theme": {
+    "primaryColor": "#4caf50",
+    "secondaryColor": "#333"
+  }
+}

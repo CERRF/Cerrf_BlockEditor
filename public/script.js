@@ -253,17 +253,62 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('workshop-file-input').click();
     });
 
-    // Handle file selection and read the content
+    // Handle file selection and read the content for workshop files.
     document.getElementById('workshop-file-input').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const content = event.target.result;
-                // If the file is JSON, parse it and generate HTML
-                if (file.name.endsWith('.json')) {
+            const fileName = file.name.toLowerCase();
+            if (fileName.endsWith('.awf')) {
+                // Use FileReader to load as an ArrayBuffer (required by JSZip)
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    JSZip.loadAsync(event.target.result)
+                        .then(function(zip) {
+                            // Read the manifest (should be at the root as manifest.json)
+                            return zip.file("manifest.json").async("string")
+                                .then(function(manifestStr) {
+                                    const manifest = JSON.parse(manifestStr);
+                                    let workshopHTML = `<h3>${manifest.title || 'Workshop'}</h3>`;
+                                    // Process each step listed in the manifest
+                                    if (Array.isArray(manifest.steps)) {
+                                        let stepPromises = manifest.steps.map(function(stepPath) {
+                                            // Each step file (e.g., steps/step1.json) is parsed as JSON.
+                                            return zip.file(stepPath).async("string")
+                                                .then(function(stepStr) {
+                                                    const step = JSON.parse(stepStr);
+                                                    // Build HTML for the step. (Images could be data URLs or created via blob URLs.)
+                                                    return `<div class="workshop-step">
+                                                        <h4>Step ${step.stepNumber || ''}: ${step.title}</h4>
+                                                        ${ step.image ? `<img src="${step.image}" alt="${step.title}" />` : '' }
+                                                        <p>${step.description}</p>
+                                                    </div>`;
+                                                });
+                                        });
+                                        Promise.all(stepPromises)
+                                            .then(function(stepsHTML) {
+                                                workshopHTML += stepsHTML.join("");
+                                                document.getElementById('workshop-content').innerHTML = workshopHTML;
+                                                // Optionally load custom CSS/JS specified in manifest.assets here.
+                                            })
+                                            .catch(function(err) {
+                                                console.error("Error processing step files:", err);
+                                            });
+                                    } else {
+                                        document.getElementById('workshop-content').innerHTML = workshopHTML;
+                                    }
+                                });
+                        })
+                        .catch(function(err) {
+                            console.error("Error loading AWF file:", err);
+                        });
+                };
+                reader.readAsArrayBuffer(file);
+            } else if (fileName.endsWith('.json')) {
+                // Handle standalone JSON workshop files (legacy support)
+                const reader = new FileReader();
+                reader.onload = function(event) {
                     try {
-                        const workshop = JSON.parse(content);
+                        const workshop = JSON.parse(event.target.result);
                         let workshopHTML = `<h3>${workshop.title || 'Workshop'}</h3>`;
                         if (Array.isArray(workshop.steps)) {
                             workshop.steps.forEach((step, index) => {
@@ -278,12 +323,129 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch (error) {
                         console.error('Error parsing workshop JSON:', error);
                     }
-                } else {
-                    // Otherwise treat it as an HTML snippet and load directly
-                    document.getElementById('workshop-content').innerHTML = content;
-                }
-            };
-            reader.readAsText(file);
+                };
+                reader.readAsText(file);
+            } else if (fileName.endsWith('.html')) {
+                // Otherwise treat it as an HTML snippet and load directly.
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('workshop-content').innerHTML = event.target.result;
+                };
+                reader.readAsText(file);
+            }
         }
     });
+
+    // Add this function to create and show the popup.
+    function showWorkshopSelectionPopup() {
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'workshop-popup-overlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = 1000;
+
+        // Create popup container
+        const popup = document.createElement('div');
+        popup.id = 'workshop-popup';
+        popup.style.background = '#fff';
+        popup.style.padding = '20px';
+        popup.style.borderRadius = '5px';
+        popup.style.maxWidth = '400px';
+        popup.style.width = '80%';
+        popup.style.textAlign = 'center';
+
+        const title = document.createElement('h3');
+        title.textContent = 'Select a Workshop';
+        popup.appendChild(title);
+
+        // Create a container for buttons
+        const listContainer = document.createElement('div');
+        listContainer.id = 'workshop-popup-list';
+        popup.appendChild(listContainer);
+
+        // Append popup to overlay and overlay to document
+        overlay.appendChild(popup);
+        document.body.appendChild(overlay);
+
+        // Fetch available workshops from the server
+        fetch('/workshops')
+            .then(response => response.json())
+            .then(workshops => {
+                // For each workshop, create a button.
+                workshops.forEach(ws => {
+                    const button = document.createElement('button');
+                    button.textContent = ws.name;
+                    button.style.margin = '5px';
+                    button.addEventListener('click', () => {
+                        // When a workshop is selected, download and load it.
+                        fetch(ws.url)
+                            .then(res => res.arrayBuffer())
+                            .then(buffer => {
+                                JSZip.loadAsync(buffer)
+                                    .then(zip => {
+                                        // Read manifest and then step files as before.
+                                        return zip.file("manifest.json").async("string")
+                                            .then(manifestStr => {
+                                                const manifest = JSON.parse(manifestStr);
+                                                let workshopHTML = `<h3>${manifest.title || 'Workshop'}</h3>`;
+                                                if (Array.isArray(manifest.steps)) {
+                                                    let stepPromises = manifest.steps.map(function(stepPath) {
+                                                        return zip.file(stepPath).async("string")
+                                                            .then(stepStr => {
+                                                                const step = JSON.parse(stepStr);
+                                                                return `<div class="workshop-step">
+                                                                    <h4>Step ${step.stepNumber || ''}: ${step.title}</h4>
+                                                                    ${ step.image ? `<img src="${step.image}" alt="${step.title}" />` : '' }
+                                                                    <p>${step.description}</p>
+                                                                </div>`;
+                                                            });
+                                                    });
+                                                    return Promise.all(stepPromises)
+                                                        .then(stepsHTML => {
+                                                            workshopHTML += stepsHTML.join("");
+                                                            return workshopHTML;
+                                                        });
+                                                } else {
+                                                    return workshopHTML;
+                                                }
+                                            });
+                                    })
+                                    .then(workshopHTML => {
+                                        document.getElementById('workshop-content').innerHTML = workshopHTML;
+                                        // Remove popup after loading
+                                        document.body.removeChild(overlay);
+                                    })
+                                    .catch(err => {
+                                        console.error("Error processing AWF file:", err);
+                                        document.body.removeChild(overlay);
+                                    });
+                            });
+                    });
+                    listContainer.appendChild(button);
+                });
+            })
+            .catch(err => {
+                console.error("Error fetching workshops:", err);
+                // Remove overlay on error
+                document.body.removeChild(overlay);
+            });
+
+        // Close popup if overlay is clicked (outside popup container)
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                document.body.removeChild(overlay);
+            }
+        });
+    }
+
+    // Attach listener to the select-workshop button
+    document.getElementById('select-workshop').addEventListener('click', showWorkshopSelectionPopup);
 });

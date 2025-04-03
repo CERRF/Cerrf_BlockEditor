@@ -55,6 +55,24 @@ const server = http.createServer((req, res) => {
         });
    
     });
+} else if (req.url === '/workshops' && req.method === 'GET') {
+    // List all workshop files in the "public/workshops" folder.
+    const workshopsDir = path.join(__dirname, '/public/workshops');
+    fs.readdir(workshopsDir, (err, files) => {
+        if (err) {
+            res.statusCode = 500;
+            return res.end(JSON.stringify({ error: "Could not read workshops directory" }));
+        }
+        // Filter workshop files by extension (e.g., awf)
+        const workshopFiles = files.filter(f => f.endsWith('.awf'));
+        // Build a list with file name and a URL (assuming files are served via /public/workshops)
+        const workshops = workshopFiles.map(file => ({
+            name: file,
+            url: `/public/workshops/${file}`
+        }));
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(workshops));
+    });
 }
 });
 server.listen(3000, () => {

@@ -1,0 +1,11 @@
+{
+    "stepNumber": 2,
+    "title": "Drag the SSH Block",
+    "description": "Drag the SSH block into the drop area and fill in the necessary details (Host, User, Command). Use a known SSH target for testing.",
+    "expectedBlock": "ssh",
+    "image": "assets/images/step2-img.png",
+    "hints": [
+      "Ensure you fill in all required fields.",
+      "The SSH block typically has a terminal icon."
+    ]
+  }
