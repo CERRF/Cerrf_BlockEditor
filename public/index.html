@@ -1,73 +1,97 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>CERRF Drag-n-Drop Terminal Executor</title>
-  <link rel="stylesheet" type="text/css" href="/public/style.css">
-  <!-- Include JSZip library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="/public/script.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Include xterm.js CSS for a hyper aesthetic look -->
-  <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <title>CERRF Drag-n-Drop Terminal Executor</title>
+    <link rel="stylesheet" type="text/css" href="/public/style.css">
+    <!-- Include JSZip, jQuery and FontAwesome from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Include xterm.js CSS for hyper aesthetic look via CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-left">
+        <img src="/public/cerrf-logo.png" alt="CERRF Logo" class="logo">
+        <span>Welcome user: <span id="client-ip">{{clientIP}}</span></span>
+      </div>
+      <div class="navbar-center">
+        <h1>Bash Block Editor</h1>
+      </div>
+      <div class="navbar-right">
+        <button class="icon-button"><i class="fas fa-question-circle"></i></button>
+        <button class="icon-button"><i class="fas fa-cog"></i></button>
+        <button class="icon-button"><i class="fas fa-save"></i></button>
+      </div>
+    </div>
 
-  <nav class="navbar">
-    <div class="navbar-left">
-      Hello <span id="user-ip">{{your_ip}}</span>
-    </div>
-    <div class="navbar-center">
-      <img src="/public/cerrf-logo.png" alt="CERRF Logo" class="logo">
-    </div>
-    <div class="navbar-right">
-      <div class="dropdown">
-        <button class="dropdown-toggle">Achievements</button>
-        <div class="dropdown-content">
-          <ul>
-            <li>Achievement 1</li>
-            <li>Achievement 2</li>
-            <li>Achievement 3</li>
-          </ul>
+    <div class="main-container">
+      <!-- Left Sidebar -->
+      <div class="sidebar">
+        <h2 class="sidebar-category" data-category="general">General Commands</h2>
+        <h2 class="sidebar-category" data-category="network">Network Commands</h2>
+        <h2 class="sidebar-category" data-category="database">Database Commands</h2>
+        <h2 class="sidebar-category" data-category="file">File Commands</h2>
+        <h2 class="sidebar-category" data-category="miscellaneous">Miscellaneous Commands</h2>
+        <h2 class="sidebar-category" data-category="filesystem">File System</h2>
+        <div id="sidebar-content" class="sidebar-content">
+          <!-- Blocks or files will be dynamically loaded here -->
+        </div>
+      </div>
+
+      <!-- Center Content -->
+      <div class="content">
+        <div class="drop-area" id="drop-area">
+          <!-- Drag-and-drop area -->
+        </div>
+        <button id="run-button" class="run-button">Run</button>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="right-sidebar">
+        <div class="animated-workshop">
+          <button class="workshop-title">Nuclear Networks - Intro</button>
+        </div>
+        <div class="animated-workshop">
+          <h2>Workshop Controls</h2>
+          <button id="load-workshop">Load Workshop from File</button>
+          <input type="file" id="workshop-file-input" accept=".cerrf" style="display:none;">
+          <button id="select-workshop">Select Workshop</button>
+          <button id="restart-workshop" disabled>Restart Workshop</button>
+        </div>
+        <div class="output-section">
+          <div id="output-terminal" class="terminal"></div>
         </div>
       </div>
     </div>
-  </nav>
 
-  <h1 style="text-align:center">CERRF Drag-and-Drop Terminal Executor</h1>
-  <div container="Left">
-    <div class="block-palette" id="block-palette">
-      <h2>Block Palette</h2>
-      <!-- Blocks will be loaded here from /blocks/blocks.json -->
-    </div>
-
-    <div class="drop-area" id="drop-area">
-      Drop command blocks here...
-      <button id="run-button" href="/run">Run</button>
-    </div>
-  </div>
-
-  <div container="Right">
-    <div class="animated-workshop">
-      <h2>Animated Workshop</h2>
-      <div id="workshop-content">
-        <!-- Dynamic content will be loaded here -->
-      </div>
-      <button id="restart-workshop" disabled>Restart Workshop</button>
-      <button id="load-workshop">Load Workshop from file</button>
-      <input type="file" id="workshop-file-input" accept=".cerrf" style="display:none;">
-      <button id="select-workshop">Select Workshop</button>
-    </div>
-
-    <div class="output-section">
-      <h2>Output</h2>
-      <div id="output-terminal" class="terminal" style="width: 100%; height: 300px;"></div>
-    </div>
-  </div>
-
-  <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
-  <script src="https://unpkg.com/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
-  <script src="/public/script.js"></script>
-</body>
+    <!-- Use a single script tag for script.js -->
+    <!-- Include xterm.js and its addon from CDN -->
+    <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+    <script src="https://unpkg.com/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+    <script src="/public/script.js"></script>
+    <script>
+      // Ensure the DOM is fully loaded before initializing the Terminal.
+      document.addEventListener('DOMContentLoaded', function() {
+          // Create and configure a Terminal instance.
+          var term = new Terminal({
+              theme: {
+                  background: '#1d1f21',
+                  foreground: '#c5c8c6',
+                  cursor: '#f8f8f0'
+              },
+              fontFamily: '"Fira Code", "Source Code Pro", monospace',
+              fontSize: 14,
+              cursorBlink: true
+          });
+          var fitAddon = new FitAddon.FitAddon();
+          term.loadAddon(fitAddon);
+          term.open(document.getElementById('output-terminal'));
+          fitAddon.fit();
+          term.write('Welcome to xterm.js\r\n$ ');
+      });
+    </script>
+  </body>
 </html>
