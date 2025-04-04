@@ -2,13 +2,15 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>CERRF Drag-and-Drop Terminal Executor</title>
+  <title>CERRF Drag-n-Drop Terminal Executor</title>
   <link rel="stylesheet" type="text/css" href="/public/style.css">
   <!-- Include JSZip library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="/public/script.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Include xterm.js CSS for a hyper aesthetic look -->
+  <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
 </head>
 <body>
 
@@ -44,12 +46,6 @@
       Drop command blocks here...
       <button id="run-button" href="/run">Run</button>
     </div>
-
-    <div class="output-section">
-      <h2>Output</h2>
-      <div id="output-terminal" class="terminal"></div>
-      <input type="text" id="terminal-input" placeholder="Type command here" onsubmit="runCommand(terminal-input.value);">
-    </div>
   </div>
 
   <div container="Right">
@@ -60,9 +56,18 @@
       </div>
       <button id="restart-workshop" disabled>Restart Workshop</button>
       <button id="load-workshop">Load Workshop from file</button>
-      <input type="file" id="workshop-file-input" accept=".json, .html" style="display:none;">
+      <input type="file" id="workshop-file-input" accept=".cerrf" style="display:none;">
       <button id="select-workshop">Select Workshop</button>
     </div>
+
+    <div class="output-section">
+      <h2>Output</h2>
+      <div id="output-terminal" class="terminal" style="width: 100%; height: 300px;"></div>
+    </div>
   </div>
+
+  <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+  <script src="https://unpkg.com/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+  <script src="/public/script.js"></script>
 </body>
 </html>

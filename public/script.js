@@ -496,4 +496,64 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ---------------------------
+    // Initialize the xterm.js Terminal with Hyper aesthetic
+    // ---------------------------
+    const termContainer = document.getElementById('output-terminal');
+    const term = new Terminal({
+        theme: {
+            background: '#1d1f21',
+            foreground: '#c5c8c6',
+            cursor: '#f8f8f0'
+        },
+        fontFamily: '"Fira Code", "Source Code Pro", monospace',
+        fontSize: 14,
+        cursorBlink: true
+    });
+    const fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(termContainer);
+    fitAddon.fit();
+    
+    // Command buffer
+    let currentCommand = '';
+
+    // Write initial prompt
+    term.write('$ ');
+
+    // Capture key data from the terminal
+    term.onData((data) => {
+        // If Enter is pressed, execute command
+        if (data === '\r') {
+            term.write('\r\n');
+            runCommand(currentCommand);
+            currentCommand = '';
+        } else if (data === '\u007F') { // Backspace
+            if (currentCommand.length > 0) {
+                currentCommand = currentCommand.slice(0, -1);
+                // Move cursor back, clear character, move cursor back again
+                term.write('\b \b');
+            }
+        } else {
+            currentCommand += data;
+            term.write(data);
+        }
+    });
+    
+    // Function to send a command to the server and display output
+    function runCommand(cmd) {
+        fetch('/run', {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+            body: cmd
+        })
+        .then((response) => response.text())
+        .then((output) => {
+            term.write(output + '\r\n$ ');
+        })
+        .catch((err) => {
+            term.write('\r\nError: ' + err.message + '\r\n$ ');
+        });
+    }
 });
