@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const banned_command = ['python', 'python3', 'bash', 'powershell', 'cmd', 'git', 'scp', 'ftp', 'telnet', 'nc', 'ncat', 'perl', 'ruby', 'php', 'java', 'node', 'npm'];
-const clientIP = '' // this is how we can get the client's IP address
+let clientIP = '' // this is how store the client's IP address
 
 const server = http.createServer((req, res) => {
     if (req.url === '/' && req.method === 'GET') {
@@ -13,7 +13,7 @@ const server = http.createServer((req, res) => {
                 return res.end('Error loading index.html');
             }
             
-            // this is how we can get the client's IP address
+            clientIP = req.socket.remoteAddress; // this is how we can get the client's IP address
             console.log('Client IP:', clientIP); // this prints it to console when the server is running
             clientIPupdated = clientIP.replace(/^::ffff:/, ''); // this removes the IPv6 prefix if it exists 
             console.log('Client IP after removing prefix:', clientIPupdated); // this prints the cleaned IP address to console
@@ -42,7 +42,7 @@ const server = http.createServer((req, res) => {
         requestBody += chunk.toString();
     });
         
-        let dirName = "clientIP";
+        let dirName = "clientIP2";
         fs.mkdir(dirName, { recursive: true }, (err)=> {
             if (err) {
                 console.error('Error creating directory:', err);

@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const paletteContainer = document.getElementById('block-palette');
     let draggedElement = null;
     let blockDefinitions = {};  // key: blockType
+    // Global variables for the workshop steps and the current index:
+    let steps = [];
+    let currentStepIndex = 0;
 
     // Fetch block definitions from JSON file and build the palette.
     fetch('/public/blocks/blocks.json')
