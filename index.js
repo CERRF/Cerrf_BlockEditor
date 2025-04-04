@@ -12,6 +12,7 @@ const server = http.createServer((req, res) => {
                 res.statusCode = 500;
                 return res.end('Error loading index.html');
             }
+            
             // this is how we can get the client's IP address
             console.log('Client IP:', clientIP); // this prints it to console when the server is running
             clientIPupdated = clientIP.replace(/^::ffff:/, ''); // this removes the IPv6 prefix if it exists 
@@ -39,21 +40,25 @@ const server = http.createServer((req, res) => {
         let requestBody = '';
         req.on('data', chunk => {
         requestBody += chunk.toString();
-        /*if (requestBody.includes(banned_command)) {
-            console.log('Command not allowed:', requestBody);
-            res.statusCode = 403; // Forbidden
-            return res.end('Command not allowed bc this bs aint allowed brev');
-        }*/
     });
         
-        
-        
+        let dirName = "clientIP";
+        fs.mkdir(dirName, { recursive: true }, (err)=> {
+            if (err) {
+                console.error('Error creating directory:', err);
+                return;
+            }
+            else{
+                console.log(`Directory '${dirName}' created successfully.`);
+            }
+        });
         req.on('end', () => {
         console.log('Received command:', requestBody);
         if(banned_command.some(command => requestBody.includes(command))){
             res.end("fuck you");
         }
         else{
+        
         const child = spawn(requestBody, { shell: true });
         let outputBuffer = '';
         

@@ -279,28 +279,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                     console.log("Manifest content:", manifest);
                                     let workshopHTML = `<h3>${manifest.title || 'Workshop'}</h3>`;
                                     if (Array.isArray(manifest.steps)) {
-                                        let stepPromises = manifest.steps.map(function(stepPath) {
-                                            // Create a regex that matches the expected step file (ignoring any parent directories)
-                                            const regex = new RegExp('(?:^|\\/)' + stepPath.replace(/\//g, '\\/') + '$');
-                                            const stepFiles = zip.file(regex).filter(file => !file.name.startsWith("__MACOSX/"));
-                                            if (stepFiles.length === 0) {
-                                                throw new Error(`Step file ${stepPath} not found in the workshop.`);
-                                            }
-                                            return stepFiles[0].async("string")
-                                                .then(function(stepStr) {
-                                                    const step = JSON.parse(stepStr);
-                                                    return `<div class="workshop-step">
-                                                        <h4>Step ${step.stepNumber || ''}: ${step.title}</h4>
-                                                        ${ step.image ? `<img src="${step.image}" alt="${step.title}" />` : '' }
-                                                        <p>${step.description}</p>
-                                                    </div>`;
-                                                });
+                                        const steps = [];
+                                        let currentStepIndex = 0;
+
+                                        // If manifest.stepCount isn’t provided, use steps length later.
+                                        return Promise.all(
+                                            manifest.steps.map(function(stepPath) {
+                                                // Create a regex to match the step file in any folder wrapper.
+                                                const regex = new RegExp('(?:^|\\/)' + stepPath.replace(/\//g, '\\/') + '$');
+                                                const stepFiles = zip.file(regex).filter(file => !file.name.startsWith("__MACOSX/"));
+                                                if (stepFiles.length === 0) {
+                                                    throw new Error(`Step file ${stepPath} not found in the workshop.`);
+                                                }
+                                                return stepFiles[0].async("string")
+                                                    .then(function(stepStr) {
+                                                        const step = JSON.parse(stepStr);
+                                                        return step;
+                                                    });
+                                            })
+                                        ).then(function(stepsArray) {
+                                            // Save steps in a global variable.
+                                            steps.push(...stepsArray);
+                                            // If manifest.stepCount is not provided, use the number of steps.
+                                            manifest.stepCount = manifest.stepCount || steps.length;
+                                            // Display the first step.
+                                            displayStep(currentStepIndex, manifest);
                                         });
-                                        return Promise.all(stepPromises)
-                                            .then(function(stepsHTML) {
-                                                workshopHTML += stepsHTML.join("");
-                                                return workshopHTML;
-                                            });
                                     }
                                     else {
                                         return workshopHTML;
@@ -440,4 +444,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Attach listener to the select-workshop button
     document.getElementById('select-workshop').addEventListener('click', showWorkshopSelectionPopup);
+
+    function displayStep(index, manifest) {
+        const workshopContent = document.getElementById('workshop-content');
+        const step = steps[index];
+        // Build the HTML for this step.
+        let html = `<div class="workshop-step">
+            <h4>Step ${step.stepNumber || index + 1}: ${step.title}</h4>
+            ${ step.image ? `<img src="${step.image}" alt="${step.title}" />` : '' }
+            <p>${step.description}</p>
+            <button id="validate-step">Validate Step</button>
+        </div>`;
+        // Navigation buttons:
+        html += `<div class="workshop-nav">`;
+        if (index > 0) {
+            html += `<button id="prev-step">Previous</button>`;
+        }
+        if (index < manifest.stepCount - 1) {
+            html += `<button id="next-step">Next</button>`;
+        }
+        html += `</div>`;
+        workshopContent.innerHTML = html;
+
+        // Set up navigation event listeners.
+        const prevBtn = document.getElementById('prev-step');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                currentStepIndex--;
+                displayStep(currentStepIndex, manifest);
+            });
+        }
+        const nextBtn = document.getElementById('next-step');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                currentStepIndex++;
+                displayStep(currentStepIndex, manifest);
+            });
+        }
+        // Validation button event.
+        document.getElementById('validate-step').addEventListener('click', () => {
+            if (validateStep(step)) {
+                // Check for an award: either from the step's own award property or from the manifest awards mapping.
+                const award = step.award || (manifest.awards ? manifest.awards[`step${step.stepNumber || index + 1}`] : "No award");
+                alert("Step completed! Award: " + award);
+                // Optionally mark the step visually as complete.
+            } else {
+                alert("Step not completed correctly. Please try again.");
+            }
+        });
+    }
 });

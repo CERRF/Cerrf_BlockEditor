@@ -2,10 +2,15 @@
   "title": "Test Workshop - Command Basics",
   "description": "A simple workshop to help you test basic command block functions.",
   "version": "1.0",
+  "stepCount": 2,
   "steps": [
     "steps/step1.json",
     "steps/step2.json"
   ],
+  "awards": {
+    "step1": "Bronze Medal",
+    "step2": "Silver Medal"
+  },
   "assets": {
     "css": "code/custom.css",
     "js": "code/custom.js"
