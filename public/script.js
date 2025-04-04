@@ -259,14 +259,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (file) {
             console.log("File selected:", file.name);
             const fileName = file.name.toLowerCase();
-            if (fileName.endsWith('.awf')) {
+            if (fileName.endsWith('.cerrf')) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     console.log("Reading file as ArrayBuffer...");
                     JSZip.loadAsync(event.target.result)
                         .then(function(zip) {
                             console.log("Loading ZIP file...");
-                            return zip.file("manifest.json").async("string")
+                            // Get all manifest.json files and ignore those in __MACOSX folders.
+                            const manifestFiles = zip.file(/(?:^|\/)manifest\.json$/).filter(file => !file.name.startsWith("__MACOSX/"));
+                            if (manifestFiles.length === 0) {
+                                throw new Error("manifest.json not found in the workshop file.");
+                            }
+                            const manifestFile = manifestFiles[0];
+                            return manifestFile.async("string")
                                 .then(function(manifestStr) {
                                     console.log("Extracting manifest.json...");
                                     const manifest = JSON.parse(manifestStr);
@@ -274,7 +280,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                     let workshopHTML = `<h3>${manifest.title || 'Workshop'}</h3>`;
                                     if (Array.isArray(manifest.steps)) {
                                         let stepPromises = manifest.steps.map(function(stepPath) {
-                                            return zip.file(stepPath).async("string")
+                                            // Create a regex that matches the expected step file (ignoring any parent directories)
+                                            const regex = new RegExp('(?:^|\\/)' + stepPath.replace(/\//g, '\\/') + '$');
+                                            const stepFiles = zip.file(regex).filter(file => !file.name.startsWith("__MACOSX/"));
+                                            if (stepFiles.length === 0) {
+                                                throw new Error(`Step file ${stepPath} not found in the workshop.`);
+                                            }
+                                            return stepFiles[0].async("string")
                                                 .then(function(stepStr) {
                                                     const step = JSON.parse(stepStr);
                                                     return `<div class="workshop-step">
@@ -284,26 +296,28 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     </div>`;
                                                 });
                                         });
-                                        Promise.all(stepPromises)
+                                        return Promise.all(stepPromises)
                                             .then(function(stepsHTML) {
                                                 workshopHTML += stepsHTML.join("");
-                                                document.getElementById('workshop-content').innerHTML = workshopHTML;
-                                            })
-                                            .catch(function(err) {
-                                                console.error("Error processing step files:", err);
+                                                return workshopHTML;
                                             });
-                                    } else {
-                                        document.getElementById('workshop-content').innerHTML = workshopHTML;
+                                    }
+                                    else {
+                                        return workshopHTML;
                                     }
                                 });
                         })
+                        .then(function(workshopHTML) {
+                            document.getElementById('workshop-content').innerHTML = workshopHTML;
+                        })
                         .catch(function(err) {
-                            console.error("Error loading AWF file:", err);
+                            console.error("Error loading CERRF file:", err.message);
+                            alert(`Error loading workshop: ${err.message}`);
                         });
                 };
                 reader.readAsArrayBuffer(file);
             } else {
-                console.error("Unsupported file type. Please upload a .awf file.");
+                console.error("Unsupported file type. Please upload a .cerrf file.");
             }
         }
     });
@@ -370,7 +384,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                                 let workshopHTML = `<h3>${manifest.title || 'Workshop'}</h3>`;
                                                 if (Array.isArray(manifest.steps)) {
                                                     let stepPromises = manifest.steps.map(function(stepPath) {
-                                                        return zip.file(stepPath).async("string")
+                                                        // Create a regex that matches the expected step file (ignoring any parent directories)
+                                                        const regex = new RegExp('(?:^|\\/)' + stepPath.replace(/\//g, '\\/') + '$');
+                                                        const stepFiles = zip.file(regex).filter(file => !file.name.startsWith("__MACOSX/"));
+                                                        if (stepFiles.length === 0) {
+                                                            throw new Error(`Step file ${stepPath} not found in the workshop.`);
+                                                        }
+                                                        return stepFiles[0].async("string")
                                                             .then(stepStr => {
                                                                 const step = JSON.parse(stepStr);
                                                                 return `<div class="workshop-step">
@@ -396,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         document.body.removeChild(overlay);
                                     })
                                     .catch(err => {
-                                        console.error("Error processing AWF file:", err);
+                                        console.error("Error processing CERRF file:", err);
                                         document.body.removeChild(overlay);
                                     });
                             });
