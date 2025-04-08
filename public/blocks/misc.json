@@ -1,0 +1,22 @@
+[  
+  {
+    "name": "Nano",
+    "class": "block",
+    "draggable": true,
+    "blockType": "nano",
+    "data-category": "misc",
+    "nestable": false,
+    "icon": "fa fa-file-text",
+    "innerHTML": "<div class=\"block-title\">Nano</div><div class=\"block-details nano-details\" style=\"display:none;\"><p class=\"explanation\">Nano is a simple command-line text editor used for editing files.</p><input type=\"text\" class=\"nano-filename\" placeholder=\"File Name\"></div>"
+  },
+  {
+    "name": "Sudo",
+    "class": "block",
+    "draggable": true,
+    "blockType": "sudo",
+    "data-category": "misc",
+    "nestable": true,
+    "icon": "fa fa-lock",
+    "innerHTML": "<div class=\"block-title\">Sudo</div><div class=\"block-details sudo-commands\" style=\"display:none;\"><p class=\"explanation\">Sudo allows commands to be executed with elevated administrative privileges. Any command block dropped here will be prefixed with 'sudo'.</p></div>"
+  }
+]

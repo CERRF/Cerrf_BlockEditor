@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Custom",
+    "class": "block",
+    "draggable": true,
+    "blockType": "command",
+    "data-category": "general",
+    "nestable": false,
+    "icon": "fa fa-terminal",
+    "innerHTML": "<div class=\"block-title\">Custom</div><div class=\"block-details command-details\" style=\"display:none;\"><p class=\"explanation\">Enter any terminal command directly. This block runs the command exactly as typed.</p><input type=\"text\" placeholder=\"Enter a terminal command/s directly\"></div>"
+  }
+]

@@ -1,0 +1,73 @@
+main .info-panel {
+  background-color: #fff;
+  border-left: 1px solid #d0d0d0;
+  width: 350px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-panel .workshop {
+  flex: 1.5;
+  background-color: antiquewhite;
+}
+
+.info-panel .terminal {
+  overflow: hidden;
+  font-family: "Fira Code", monospace;
+  display: flex;
+  flex-direction: column;
+  padding: 5;
+  flex: 1;
+}
+
+.terminal span {
+  padding: 10px 0px;
+  border-radius: 10px 10px 0px 0px;
+  background-color: #1d1f21;
+  font-family: "Fira Code", monospace;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 10px;
+  color: #797979;
+}
+
+.terminal .console {
+  padding: 10px;
+  background-color: #1d1f21;
+  color: #6a7df9;
+  flex: 1;
+  font-size: 12px;
+  overflow-y: scroll;
+}
+
+.terminal .console::-webkit-scrollbar {
+  width: 3px;
+}
+
+.terminal .console::-webkit-scrollbar-thumb {
+  background-color: #6a7df9;
+  border-radius: 3px;
+  background-clip: padding-box;
+}
+
+.terminal .input-container {
+  display: flex;
+  align-items: center;
+  padding: 0px 10px;
+  background-color: #1d1f21;
+  color: #6a7df9;
+  border-radius: 0px 0px 10px 10px;
+}
+
+.terminal .input-container input {
+  flex: 1;
+  padding: 10px;
+  background-color: #1d1f21;
+  color: #6a7df9;
+  border: none;
+  outline: none;
+  font-family: "Fira Code", monospace;
+  font-size: 12px;
+}

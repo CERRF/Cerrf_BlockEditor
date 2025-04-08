@@ -1,0 +1,68 @@
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+/*Main CSS - Parent*/
+main {
+  display: flex;
+  flex-direction: row;
+}
+
+/*Screen Size Warning CSS*/
+.screen-size-warning {
+  display: none;
+}
+
+@media only screen and (max-width: 900px), only screen and (max-height: 600px) {
+  header, main {
+    display: none;
+  }
+  
+  .screen-size-warning {
+    width: 100%;
+    height: 100vh;
+    background-color: #000000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    z-index: 9999;
+  }
+
+  .screen-size-warning .msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 75vw;
+    height: 75vh;
+    text-align: center;
+  }
+
+  .screen-size-warning img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    object-position: center;
+    filter: brightness(0) invert(1);
+    margin-bottom: 20px;
+  }
+
+  .screen-size-warning h1 {
+    color: white;
+    font-family: 'Tomorrow', sans-serif;
+    font-weight: 500;
+    font-size: 50px;
+    margin-bottom: 30px;
+  }
+
+  .screen-size-warning p {
+    color: #00FF00;
+    font-family: 'Tomorrow', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    max-width: 500px;
+  }
+}

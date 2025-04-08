@@ -1,0 +1,19 @@
+.block-list .block {
+  width: fit-content;
+  height: fit-content;
+  background-color: var(--theme);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.block .block-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: "Tomorrow", sans-serif;
+  font-weight: 500;
+  font-size: 1.0rem;
+  color: #fefefe;
+}
